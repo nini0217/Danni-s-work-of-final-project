@@ -52,6 +52,31 @@ function draw() {
       DecorateWheels.drawWheel(c, scaleFactor); // drawWheel must accept scaleFactor as second arg
     }
   }
+
+  // Particle rendering block
+  if (window.particles) {
+    // Loop through particles in reverse to allow safe removal
+    for (let i = window.particles.length - 1; i >= 0; i--) {
+      const p = window.particles[i];
+
+      // Set fill color with alpha transparency
+      noStroke();
+      fill(p.col.levels[0], p.col.levels[1], p.col.levels[2], p.alpha);
+
+      // Draw particle as a small circle
+      ellipse(p.x, p.y, p.r);
+
+      // Update particle position based on velocity
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Fade out particle over time
+      p.alpha -= 4;
+
+      // Remove particle if fully transparent
+      if (p.alpha <= 0) window.particles.splice(i, 1);
+    }
+  }
 }
 
 // Reposition canvas and button when window is resized

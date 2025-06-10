@@ -70,7 +70,39 @@ const DecorateWheels = {
       }
     }
 
-    pop(); // Restore previous drawing state
+    // === Emit particles from the two outermost layers ===
+    const particleLayers = [0, 1]; // Indexes for outermost and second outer layer
+      for (let k = 0; k < particleLayers.length; k++) {
+        const idx = particleLayers[k];
+        if (idx < cols.length) {
+          const col = cols[idx]; // Get stroke color for this layer
+          const layerR = radius - idx * (radius / circleSystem.LAYERS); // Radius for this layer
+
+          // Choose a random direction around the circle
+          const angle = random(TWO_PI);
+          const px = cos(angle) * layerR;
+          const py = sin(angle) * layerR;
+
+          // Create a new particle object
+          if (sound.isPlaying() && fft.getEnergy("bass") > 180) {
+            const particle = {
+              x: x + px,                        // Initial x-position on the ring
+              y: y + py,                        // Initial y-position on the ring
+              vx: cos(angle) * random(1, 2),    // Velocity in x-direction
+              vy: sin(angle) * random(1, 2),    // Velocity in y-direction
+              r: 4,                             // Radius of the particle
+              alpha: 255,                       // Transparency for fading effect
+              col: col                          // Color matching the ring
+            };
+
+            // Store particle in global array if exists, otherwise initialize it
+            if (!window.particles) window.particles = [];
+            window.particles.push(particle); // Add to particle system
+          }
+        }
+      }
+
+      pop(); // Restore previous drawing state
   },
 
   // Utility function to generate a random RGB color
