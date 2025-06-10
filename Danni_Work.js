@@ -1,14 +1,26 @@
+/**
+ * Audio-reactive sketch with visual scaling and particle effects.
+ * Uses FFT to map bass energy to global visual scale and to trigger particles.
+ */
+
+// Declare global variables for audio, FFT, and UI
 let sound;
 let fft;
 let audioButton;
 let numBins = 64; // Number of frequency bins in FFT analysis
 let smoothing = 0.8; // Smoothing factor for FFT (0 = no smoothing, 1 = lots of smoothing)
 
-// Load audio before sketch starts
+/**
+ * Step 1: Load audio before setup begins.
+ * We use preload() to ensure the file is fully available before anything starts.
+ */
 function preload() {
   sound = loadSound('assets/352072_2305278-lq.mp3'); // Replace with your own audio path
 }
 
+/**
+ * Step 2: Setup the canvas, FFT analysis, and play/pause button.
+ */
 function setup() {
   // Set up canvas and generate base visuals (if defined externally)
   if (typeof CanvasManager !== 'undefined') {
@@ -18,11 +30,18 @@ function setup() {
     circleSystem.generateCircles();
   }
 
-  // Create FFT object for frequency analysis
+  /**
+   * Initialize p5.FFT with smoothing and number of bins.
+   * Connect the loaded sound to the FFT analyzer.
+   */
   fft = new p5.FFT(smoothing, numBins);
   sound.connect(fft); // Connect sound to the FFT
 
-  // Create a button to toggle play/pause
+
+  /**
+   * Create a UI button to toggle playback.
+   * Position the button near the bottom center of the canvas.
+   */
   audioButton = createButton('Play / Pause');
   audioButton.position((width - audioButton.width) / 2, height - audioButton.height - 20);
   audioButton.mousePressed(toggleAudio);
@@ -30,6 +49,9 @@ function setup() {
   loop(); // Enable continuous draw loop (important when using audio)
 }
 
+/**
+ * Step 3: Draw visuals each frame, based on FFT data and system state.
+ */
 function draw() {
   // Clear canvas
   if (typeof CanvasManager !== 'undefined') {
@@ -53,33 +75,28 @@ function draw() {
     }
   }
 
-  // Particle rendering block
+  /**
+   * Step 4: Particle rendering block.
+   * Loops through particles, updates their position and alpha, and draws them.
+   * Particles are removed once fully transparent.
+   */
   if (window.particles) {
-    // Loop through particles in reverse to allow safe removal
     for (let i = window.particles.length - 1; i >= 0; i--) {
       const p = window.particles[i];
-
-      // Set fill color with alpha transparency
       noStroke();
       fill(p.col.levels[0], p.col.levels[1], p.col.levels[2], p.alpha);
-
-      // Draw particle as a small circle
       ellipse(p.x, p.y, p.r);
-
-      // Update particle position based on velocity
       p.x += p.vx;
       p.y += p.vy;
-
-      // Fade out particle over time
       p.alpha -= 4;
-
-      // Remove particle if fully transparent
       if (p.alpha <= 0) window.particles.splice(i, 1);
     }
   }
 }
 
-// Reposition canvas and button when window is resized
+/**
+ * Step 5: Update canvas and UI layout when window is resized.
+ */
 function windowResized() {
   if (typeof CanvasManager !== 'undefined') {
     CanvasManager.resizeCanvas();
@@ -89,7 +106,9 @@ function windowResized() {
   }
 }
 
-// Toggle audio playback
+/**
+ * Step 6: Toggle playback of audio when button is pressed.
+ */
 function toggleAudio() {
   if (sound.isPlaying()) {
     sound.pause();

@@ -1,5 +1,14 @@
 // danni-g.js
-// DecorateWheels is responsible for rendering each visual "wheel" using layered circles, dots, and a central core.
+/**
+ * Draws a decorative, multi-layered wheel at a given position.
+ * This wheel responds to audio input with ripple and particle effects.
+ * 
+ * Steps:
+ * 1. Draw concentric rings and radial dots.
+ * 2. Add a central solid circle.
+ * 3. Overlay dynamic waveform-based ripple on outer layers.
+ * 4. Emit particles outward based on audio bass energy.
+ */
 const DecorateWheels = {
   // Draws a decorative wheel based on provided circle data 'c' and an optional scaleFactor (default = 1)
   drawWheel: function(c, scaleFactor = 1) {
@@ -13,7 +22,10 @@ const DecorateWheels = {
     translate(x, y); // Set (0,0) to the center of the current wheel
     noFill();        // No fill for rings, only stroke
 
-    // === Decorative rings + radial dots ===
+    /**
+     * Step 1: Draw layered rings and radial dots.
+     * Each ring shrinks in radius and contains more dots.
+     */
     for (let i = 0; i < cols.length; i++) {
       const col = cols[i];
       const layerR = radius - i * (radius / circleSystem.LAYERS); // Calculate radius for this layer
@@ -34,12 +46,18 @@ const DecorateWheels = {
       }
     }
 
-    // === Central circle ===
+    /**
+     * Step 2: Draw central solid circle.
+     * Acts as a visual anchor for each wheel.
+     */
     stroke(centerCol);
     strokeWeight(radius * 0.05);
     ellipse(0, 0, radius * 0.5); // Draw central solid circle
     
-    // === Add waveform ripple to two outer layers: outermost and second outer layer ===
+    /**
+     * Step 3: Add audio-reactive waveform ripple.
+     * This is applied to the outermost and second rings.
+     */
     const waveform = fft.waveform();          // Get current audio waveform data
     const waveLayers = [0, 1];                // Indexes of the layers to apply ripple (outermost and second layer)
     const numPoints = 120;                    // Number of vertices used to draw each ripple shape
@@ -70,7 +88,10 @@ const DecorateWheels = {
       }
     }
 
-    // === Emit particles from the two outermost layers ===
+    /**
+     * Step 4: Emit particles from outer rings if bass energy is high.
+     * Particles travel outward and fade over time.
+     */
     const particleLayers = [0, 1]; // Indexes for outermost and second outer layer
       for (let k = 0; k < particleLayers.length; k++) {
         const idx = particleLayers[k];
