@@ -38,6 +38,37 @@ const DecorateWheels = {
     stroke(centerCol);
     strokeWeight(radius * 0.05);
     ellipse(0, 0, radius * 0.5); // Draw central solid circle
+    
+    // === Add waveform ripple to two outer layers: outermost and second outer layer ===
+    const waveform = fft.waveform();          // Get current audio waveform data
+    const waveLayers = [0, 1];                // Indexes of the layers to apply ripple (outermost and second layer)
+    const numPoints = 120;                    // Number of vertices used to draw each ripple shape
+
+    for (let w = 0; w < waveLayers.length; w++) {
+      const idx = waveLayers[w];             // Layer index to apply ripple
+      if (idx < cols.length) {
+        const waveR = radius - idx * (radius / circleSystem.LAYERS); // Base radius for this layer
+        const waveColor = cols[idx];         // Use the same stroke color as the ring
+
+        noFill();
+        stroke(waveColor);
+        strokeWeight(1.5);
+        beginShape();
+
+        // Generate ripple shape using waveform data
+        for (let j = 0; j < numPoints; j++) {
+          const angle = (TWO_PI / numPoints) * j;
+          const waveIndex = floor(map(j, 0, numPoints, 0, waveform.length)); // Map to waveform array index
+          const waveOffset = waveform[waveIndex] * 25;                       // Convert waveform value to offset
+          const r = waveR + waveOffset;                                      // Final radius with ripple
+          const px = cos(angle) * r;
+          const py = sin(angle) * r;
+          vertex(px, py); // Plot each point of the ripple shape
+        }
+
+        endShape(CLOSE); // Complete the ripple ring
+      }
+    }
 
     pop(); // Restore previous drawing state
   },
