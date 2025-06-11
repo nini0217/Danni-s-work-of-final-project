@@ -80,6 +80,16 @@ function draw() {
    * Loops through particles, updates their position and alpha, and draws them.
    * Particles are removed once fully transparent.
    */
+      // ==== Reference Acknowledgement ====
+    // Certain techniques in this sketch were adapted from the work of sudhanshu :
+    // https://openprocessing.org/sketch/1614870
+    // Specifically:
+    // - The radial particle system using p5.Vector.random2D() for directional spawn
+    // - Combining waveform data with FFT.getEnergy() to drive radius-based wave distortion
+    // - Color mapping using HSB mode for particle and shape layering
+    // These techniques have been integrated into my group's visual structure
+    // and further extended with original layout and animation logic.
+    const particleLayers = [0, 1]; // Indexes for outermost and second outer layer
   if (window.particles) {
     for (let i = window.particles.length - 1; i >= 0; i--) {
       const p = window.particles[i];
